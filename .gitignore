@@ -1,0 +1,16 @@
+# InterviewPro
+*.pyc
+__pycache__/
+*.pyo
+*.egg-info/
+dist/
+build/
+.env
+venv/
+env/
+
+# Frontend
+node_modules/
+frontend/dist/
+.DS_Store
+*.log
