@@ -9,10 +9,32 @@ and starts the development server.
 """
 
 import os
-from flask import Flask, request
-from config import config_by_name
+import logging
+from flask import Flask, request, send_from_directory
+from config import config_by_name, BASE_DIR
 from extensions import db, jwt
 from utils.response import error_response, success_response
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+)
+logger = logging.getLogger(__name__)
+
+# Path to built frontend files
+FRONTEND_DIST = os.path.join(BASE_DIR, "..", "frontend", "dist")
+
+
+def validate_env():
+    """Validate that required environment variables are set."""
+    required = ["SECRET_KEY", "DATABASE_URL"]
+    missing = [var for var in required if not os.environ.get(var)]
+    if missing:
+        raise RuntimeError(
+            f"Missing required environment variables: {', '.join(missing)}. "
+            "Set them in your .env file or system environment."
+        )
 
 
 def create_app(config_name=None):
@@ -28,6 +50,10 @@ def create_app(config_name=None):
     if config_name is None:
         config_name = os.environ.get("FLASK_ENV", "development")
 
+    # Validate env vars (skip for testing which uses SQLite)
+    if config_name != "testing":
+        validate_env()
+
     app = Flask(__name__)
     app.config.from_object(config_by_name.get(config_name, config_by_name["development"]))
 
@@ -35,19 +61,31 @@ def create_app(config_name=None):
     db.init_app(app)
     jwt.init_app(app)
 
-    # ---- CORS: manually inject headers on every response ----
+    # ---- CORS: inject headers on every response ----
     @app.after_request
     def add_cors_headers(response):
         origin = request.headers.get("Origin", "")
-        allowed = app.config.get("CORS_ORIGINS", [])
-        # Allow if origin is in the whitelist, or allow all localhost in development
-        if origin in allowed or origin.startswith("http://localhost"):
+        allowed = [o.strip() for o in app.config.get("CORS_ORIGINS", [])]
+
+        if origin in allowed:
             response.headers["Access-Control-Allow-Origin"] = origin
-        else:
-            response.headers["Access-Control-Allow-Origin"] = "*"
+            response.headers["Access-Control-Allow-Credentials"] = "true"
+        elif app.config.get("DEBUG") and origin:
+            # Allow all origins in development mode
+            response.headers["Access-Control-Allow-Origin"] = origin
+            response.headers["Access-Control-Allow-Credentials"] = "true"
+
         response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
         response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
-        response.headers["Access-Control-Allow-Credentials"] = "true"
+
+        # Security headers
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["X-XSS-Protection"] = "1; mode=block"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        if not app.config.get("DEBUG"):
+            response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+
         return response
 
     @app.before_request
@@ -117,6 +155,16 @@ def create_app(config_name=None):
     @app.route("/api/health", methods=["GET"])
     def health_check():
         return success_response({"app": "InterviewPro API"}, "Healthy")
+
+    # ---- Serve Frontend Static Files (Production) ----
+    if not app.config.get("DEBUG") and os.path.isdir(FRONTEND_DIST):
+        @app.route("/", defaults={"path": ""})
+        @app.route("/<path:path>")
+        def serve_frontend(path):
+            file_path = os.path.join(FRONTEND_DIST, path)
+            if path and os.path.isfile(file_path):
+                return send_from_directory(FRONTEND_DIST, path)
+            return send_from_directory(FRONTEND_DIST, "index.html")
 
     # ---- Create Tables (Development Only) ----
     with app.app_context():

@@ -7,8 +7,8 @@
 
 import axios from "axios";
 
-// Use direct backend URL when running locally; use Vite proxy when accessed via LAN
-const BASE_URL = window.location.hostname === "localhost" ? "http://localhost:5000" : "http://192.168.2.196:5000";
+const BASE_URL = import.meta.env.VITE_API_URL;
+console.log("API Base URL :", BASE_URL);
 
 // Create Axios instance with default configuration
 const api = axios.create({

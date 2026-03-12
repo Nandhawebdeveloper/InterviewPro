@@ -20,12 +20,10 @@ class Config:
     """Base configuration class."""
 
     # Flask secret key
-    SECRET_KEY = os.environ.get("SECRET_KEY", "super-secret-key-change-in-production")
+    SECRET_KEY = os.environ.get("SECRET_KEY")
 
     # SQLAlchemy database URI
-    SQLALCHEMY_DATABASE_URI = os.environ.get(
-        "DATABASE_URL", "mysql+pymysql://root:password@localhost:3306/InterviewPro"
-    )
+    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # JWT Configuration

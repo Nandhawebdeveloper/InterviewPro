@@ -8,8 +8,10 @@ Supports Python, JavaScript (Node.js).
 import subprocess
 import tempfile
 import os
+import time
+from collections import defaultdict
 from flask import Blueprint, request
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from utils.response import success_response, error_response
 
 code_bp = Blueprint("code", __name__)
@@ -22,10 +24,33 @@ SUPPORTED_LANGUAGES = {
 MAX_EXECUTION_TIME = 10  # seconds
 MAX_OUTPUT_SIZE = 10000  # characters
 
+# Simple in-memory rate limiter: user_id -> list of timestamps
+_rate_limit_store = defaultdict(list)
+RATE_LIMIT_MAX = 5        # max requests
+RATE_LIMIT_WINDOW = 60    # per 60 seconds
+
+
+def _is_rate_limited(user_id):
+    """Check if user has exceeded code execution rate limit."""
+    now = time.time()
+    timestamps = _rate_limit_store[user_id]
+    # Remove expired entries
+    _rate_limit_store[user_id] = [t for t in timestamps if now - t < RATE_LIMIT_WINDOW]
+    if len(_rate_limit_store[user_id]) >= RATE_LIMIT_MAX:
+        return True
+    _rate_limit_store[user_id].append(now)
+    return False
+
 
 @code_bp.route("/code/run", methods=["POST"])
 @jwt_required()
 def run_code():
+    user_id = get_jwt_identity()
+
+    # Rate limit check
+    if _is_rate_limited(user_id):
+        return error_response("Rate limit exceeded. Max 5 executions per minute.", 429)
+
     data = request.get_json()
     if not data:
         return error_response("Request body is required", 400)
@@ -42,8 +67,11 @@ def run_code():
     # Block dangerous imports/operations
     dangerous_patterns = [
         "import os", "import subprocess", "import shutil", "import sys",
+        "import socket", "import signal", "import ctypes",
         "__import__", "exec(", "eval(", "open(", "system(",
+        "globals(", "locals(", "compile(", "getattr(", "__builtins__",
         "require('fs')", "require('child_process')", "require('os')",
+        "require('net')", "require('http')", "require('https')",
         "process.exit", "rm -", "del /", "format(",
     ]
     code_lower = code.lower()
