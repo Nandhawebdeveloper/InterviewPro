@@ -214,6 +214,20 @@ _TEMPLATES = {
                 "correct_answer": "Adds elements to the end of an array",
                 "explanation": "push() adds one or more elements to the end of an array and returns the new length."
             },
+            {
+                "title": "What is the difference between == and === in JavaScript?",
+                "description": "Select the most accurate description of == vs ===.",
+                "options": ["=== checks value and type; == performs type coercion before comparing", "They are identical", "== is stricter than ===", "=== only works with numbers"],
+                "correct_answer": "=== checks value and type; == performs type coercion before comparing",
+                "explanation": "Use === (strict equality) to avoid unexpected type coercion bugs."
+            },
+            {
+                "title": "What is a closure in JavaScript?",
+                "description": "Select the best definition of a closure.",
+                "options": ["A function that retains access to its outer scope even after the outer function has returned", "A way to close browser windows", "A method to end a loop early", "An error handling mechanism"],
+                "correct_answer": "A function that retains access to its outer scope even after the outer function has returned",
+                "explanation": "Closures allow inner functions to access variables from their enclosing scope."
+            },
         ],
         "Medium": [
             {
@@ -230,6 +244,20 @@ _TEMPLATES = {
                 "correct_answer": "undefined means declared but not assigned; null is an intentional empty value",
                 "explanation": "undefined is the default value for uninitialized variables; null is explicitly assigned."
             },
+            {
+                "title": "What is the purpose of Promise.all() in JavaScript?",
+                "description": "Select the correct answer about Promise.all().",
+                "options": ["Runs multiple promises in parallel and resolves when all complete, or rejects if any fail", "Runs promises sequentially", "Resolves with the first promise to finish", "Catches errors from all promises"],
+                "correct_answer": "Runs multiple promises in parallel and resolves when all complete, or rejects if any fail",
+                "explanation": "Promise.all() is useful for parallelizing independent async operations."
+            },
+            {
+                "title": "What is the difference between let, const, and var in JavaScript?",
+                "description": "Select the best comparison of var, let, and const.",
+                "options": ["var is function-scoped and hoisted; let and const are block-scoped; const cannot be reassigned", "They are all the same", "const means constant memory allocation", "let is global, var is local"],
+                "correct_answer": "var is function-scoped and hoisted; let and const are block-scoped; const cannot be reassigned",
+                "explanation": "Prefer const by default, let when you need reassignment, and avoid var in modern code."
+            },
         ],
         "Hard": [
             {
@@ -238,6 +266,20 @@ _TEMPLATES = {
                 "options": ["A mechanism that handles asynchronous callbacks by checking the call stack and task queue", "A loop that runs events in sequence", "A DOM rendering cycle", "A memory management system"],
                 "correct_answer": "A mechanism that handles asynchronous callbacks by checking the call stack and task queue",
                 "explanation": "The event loop continuously checks if the call stack is empty and pushes callbacks from the task queue."
+            },
+            {
+                "title": "What is the difference between microtasks and macrotasks in JavaScript?",
+                "description": "Select the correct description of microtasks vs macrotasks.",
+                "options": ["Microtasks (Promises) run before macrotasks (setTimeout) after each task completes", "Macrotasks always run first", "They execute in parallel", "There is no difference"],
+                "correct_answer": "Microtasks (Promises) run before macrotasks (setTimeout) after each task completes",
+                "explanation": "The microtask queue (Promises, queueMicrotask) is drained completely before the next macrotask executes."
+            },
+            {
+                "title": "What is a Proxy object in JavaScript?",
+                "description": "Select the correct answer about the JavaScript Proxy object.",
+                "options": ["An object that wraps another and intercepts operations like get, set, and has", "A network proxy for fetch requests", "A function wrapper for async code", "A design pattern for object factories"],
+                "correct_answer": "An object that wraps another and intercepts operations like get, set, and has",
+                "explanation": "Proxy allows you to define custom behavior for fundamental operations on objects via traps."
             },
         ],
     },
@@ -282,6 +324,20 @@ _TEMPLATES = {
                 "correct_answer": "Incremental rendering, ability to pause and resume work, priority-based updates",
                 "explanation": "Fiber is a reimplementation of React's core algorithm for incremental rendering."
             },
+            {
+                "title": "What is reconciliation in React?",
+                "description": "Select the correct definition of React reconciliation.",
+                "options": ["The process React uses to diff the virtual DOM and update only changed parts of the real DOM", "The process of merging CSS stylesheets", "Resolving prop conflicts between components", "Syncing state with a database"],
+                "correct_answer": "The process React uses to diff the virtual DOM and update only changed parts of the real DOM",
+                "explanation": "Reconciliation uses heuristics including the key prop to minimise actual DOM updates."
+            },
+            {
+                "title": "What is the difference between useCallback and useMemo?",
+                "description": "Select the correct comparison of useCallback and useMemo.",
+                "options": ["useCallback memoizes a function reference; useMemo memoizes a computed value", "They are identical", "useMemo is for async functions only", "useCallback re-runs on every render"],
+                "correct_answer": "useCallback memoizes a function reference; useMemo memoizes a computed value",
+                "explanation": "useCallback(fn, deps) returns the same function reference; useMemo(fn, deps) returns the cached return value."
+            },
         ],
     },
     "Python": {
@@ -293,6 +349,20 @@ _TEMPLATES = {
                 "correct_answer": "A concise way to create lists using a single line of code",
                 "explanation": "List comprehensions provide a concise way to create lists: [x for x in iterable]."
             },
+            {
+                "title": "What is the difference between a list and a tuple in Python?",
+                "description": "Select the most accurate comparison of list and tuple.",
+                "options": ["Lists are mutable; tuples are immutable", "Tuples are faster to write", "Lists can only hold numbers", "There is no difference"],
+                "correct_answer": "Lists are mutable; tuples are immutable",
+                "explanation": "Tuples are hashable and can be used as dictionary keys; lists cannot."
+            },
+            {
+                "title": "What does the *args syntax mean in Python functions?",
+                "description": "Select the correct explanation of *args.",
+                "options": ["Allows a function to accept any number of positional arguments as a tuple", "Multiplies all arguments", "Accepts only keyword arguments", "Forces argument unpacking"],
+                "correct_answer": "Allows a function to accept any number of positional arguments as a tuple",
+                "explanation": "*args collects extra positional arguments into a tuple inside the function."
+            },
         ],
         "Medium": [
             {
@@ -302,6 +372,20 @@ _TEMPLATES = {
                 "correct_answer": "A mutex that allows only one thread to execute Python bytecode at a time",
                 "explanation": "The GIL prevents multiple threads from executing Python bytecodes simultaneously."
             },
+            {
+                "title": "What is the difference between @staticmethod and @classmethod in Python?",
+                "description": "Select the correct comparison.",
+                "options": ["@staticmethod takes no implicit first argument; @classmethod receives the class as the first argument", "They are identical", "@classmethod cannot access the class", "@staticmethod must return a value"],
+                "correct_answer": "@staticmethod takes no implicit first argument; @classmethod receives the class as the first argument",
+                "explanation": "@classmethod is used for factory methods; @staticmethod is a plain function namespaced inside a class."
+            },
+            {
+                "title": "What is a generator in Python?",
+                "description": "Select the best description of a Python generator.",
+                "options": ["A function that yields values lazily using the yield keyword, producing an iterator", "A function that returns a list", "A built-in class for random number generation", "A decorator that repeats a function"],
+                "correct_answer": "A function that yields values lazily using the yield keyword, producing an iterator",
+                "explanation": "Generators are memory-efficient for large sequences since they produce values on demand."
+            },
         ],
         "Hard": [
             {
@@ -310,6 +394,20 @@ _TEMPLATES = {
                 "options": ["Classes that define how other classes behave — the class of a class", "Classes that cannot be instantiated", "Classes with only static methods", "Abstract base classes"],
                 "correct_answer": "Classes that define how other classes behave — the class of a class",
                 "explanation": "Metaclasses define the behavior of classes themselves, with type being the default metaclass."
+            },
+            {
+                "title": "What is the difference between deepcopy and shallow copy in Python?",
+                "description": "Select the correct explanation.",
+                "options": ["Shallow copy copies only top-level references; deepcopy recursively copies all nested objects", "deepcopy is faster than shallow copy", "They produce identical results", "Shallow copy only works on lists"],
+                "correct_answer": "Shallow copy copies only top-level references; deepcopy recursively copies all nested objects",
+                "explanation": "Use copy.deepcopy() when you need a fully independent clone of a nested data structure."
+            },
+            {
+                "title": "What is asyncio in Python?",
+                "description": "Select the correct description of Python asyncio.",
+                "options": ["A library for writing concurrent code using async/await syntax and an event loop", "A multi-processing library", "A thread pool implementation", "A library for GPU programming"],
+                "correct_answer": "A library for writing concurrent code using async/await syntax and an event loop",
+                "explanation": "asyncio is ideal for I/O-bound tasks; it runs coroutines cooperatively on a single thread."
             },
         ],
     },
@@ -322,6 +420,20 @@ _TEMPLATES = {
                 "correct_answer": "Returns only unique rows from a query",
                 "explanation": "DISTINCT eliminates duplicate rows from the result set."
             },
+            {
+                "title": "What is the purpose of GROUP BY in SQL?",
+                "description": "Select the correct answer about GROUP BY.",
+                "options": ["Groups rows with the same values so aggregate functions can be applied per group", "Sorts the result set", "Filters rows before aggregation", "Joins two tables"],
+                "correct_answer": "Groups rows with the same values so aggregate functions can be applied per group",
+                "explanation": "GROUP BY is used with aggregate functions like COUNT, SUM, AVG, MAX, MIN."
+            },
+            {
+                "title": "What is a foreign key?",
+                "description": "Select the correct definition of a foreign key.",
+                "options": ["A column that references the primary key of another table to enforce referential integrity", "A key used for encryption", "The second column in a table", "An index on a non-primary column"],
+                "correct_answer": "A column that references the primary key of another table to enforce referential integrity",
+                "explanation": "Foreign keys create relationships between tables and prevent orphaned records."
+            },
         ],
         "Medium": [
             {
@@ -331,6 +443,20 @@ _TEMPLATES = {
                 "correct_answer": "INNER JOIN returns matching rows from both tables; LEFT JOIN returns all rows from the left table",
                 "explanation": "LEFT JOIN preserves all rows from the left table, filling NULLs for non-matching right table rows."
             },
+            {
+                "title": "What is the difference between WHERE and HAVING in SQL?",
+                "description": "Select the correct comparison of WHERE and HAVING.",
+                "options": ["WHERE filters rows before grouping; HAVING filters groups after GROUP BY", "They are interchangeable", "HAVING is faster than WHERE", "WHERE is used with JOINs only"],
+                "correct_answer": "WHERE filters rows before grouping; HAVING filters groups after GROUP BY",
+                "explanation": "HAVING is used to filter aggregated results — you cannot use aggregate functions in a WHERE clause."
+            },
+            {
+                "title": "What is a subquery in SQL?",
+                "description": "Select the correct answer about subqueries.",
+                "options": ["A query nested inside another query, used in SELECT, FROM, or WHERE clauses", "A stored procedure", "A query that runs on a sub-database", "A partial table scan"],
+                "correct_answer": "A query nested inside another query, used in SELECT, FROM, or WHERE clauses",
+                "explanation": "Subqueries (also called inner queries) can return scalar values, rows, or tables."
+            },
         ],
         "Hard": [
             {
@@ -339,6 +465,20 @@ _TEMPLATES = {
                 "options": ["A function that performs calculations across a set of rows related to the current row", "A function that opens new database connections", "A GUI feature in database tools", "A function that creates views"],
                 "correct_answer": "A function that performs calculations across a set of rows related to the current row",
                 "explanation": "Window functions compute values over a partition of rows defined by OVER() clause."
+            },
+            {
+                "title": "What is query optimization in SQL?",
+                "description": "Select the best description of SQL query optimization.",
+                "options": ["The process of choosing the most efficient execution plan using indexes, avoiding full table scans, and rewriting queries", "Compressing SQL query text", "Caching the database in RAM", "Normalizing table names"],
+                "correct_answer": "The process of choosing the most efficient execution plan using indexes, avoiding full table scans, and rewriting queries",
+                "explanation": "Use EXPLAIN/EXPLAIN ANALYZE to inspect query plans and identify bottlenecks."
+            },
+            {
+                "title": "What is a CTE (Common Table Expression)?",
+                "description": "Select the correct description of a CTE.",
+                "options": ["A named temporary result set defined with WITH that can be referenced in the main query", "A type of index", "A stored function", "A table constraint"],
+                "correct_answer": "A named temporary result set defined with WITH that can be referenced in the main query",
+                "explanation": "CTEs improve readability and allow recursive queries with WITH RECURSIVE."
             },
         ],
     },
@@ -351,6 +491,20 @@ _TEMPLATES = {
                 "correct_answer": "O(1)",
                 "explanation": "Array elements can be accessed directly by index in constant time."
             },
+            {
+                "title": "What is the time complexity of linear search?",
+                "description": "Select the correct time complexity of searching unsorted data linearly.",
+                "options": ["O(n)", "O(1)", "O(log n)", "O(n log n)"],
+                "correct_answer": "O(n)",
+                "explanation": "Linear search visits each element once in the worst case."
+            },
+            {
+                "title": "What is a linked list?",
+                "description": "Select the correct definition of a linked list.",
+                "options": ["A linear data structure where each element (node) points to the next node in sequence", "An array with dynamic size", "A doubly-indexed array", "A tree with only one child per node"],
+                "correct_answer": "A linear data structure where each element (node) points to the next node in sequence",
+                "explanation": "Linked lists allow O(1) insertions at the head but O(n) index access, unlike arrays."
+            },
         ],
         "Medium": [
             {
@@ -360,6 +514,20 @@ _TEMPLATES = {
                 "correct_answer": "Stack",
                 "explanation": "A stack follows LIFO — the last element pushed is the first one popped."
             },
+            {
+                "title": "What is the time complexity of binary search?",
+                "description": "Select the correct time complexity of binary search on a sorted array.",
+                "options": ["O(log n)", "O(n)", "O(1)", "O(n log n)"],
+                "correct_answer": "O(log n)",
+                "explanation": "Binary search halves the search space on every step, giving O(log n) time."
+            },
+            {
+                "title": "What is the difference between BFS and DFS?",
+                "description": "Select the correct comparison of BFS and DFS.",
+                "options": ["BFS explores level by level using a queue; DFS explores as deep as possible using a stack/recursion", "BFS uses a stack; DFS uses a queue", "They produce identical traversal orders", "BFS is always faster"],
+                "correct_answer": "BFS explores level by level using a queue; DFS explores as deep as possible using a stack/recursion",
+                "explanation": "BFS finds shortest paths in unweighted graphs; DFS is useful for topological sort and cycle detection."
+            },
         ],
         "Hard": [
             {
@@ -368,6 +536,20 @@ _TEMPLATES = {
                 "options": ["O((V + E) log V)", "O(V²)", "O(V * E)", "O(E log E)"],
                 "correct_answer": "O((V + E) log V)",
                 "explanation": "With a min-heap (priority queue), Dijkstra's achieves O((V + E) log V)."
+            },
+            {
+                "title": "What is dynamic programming?",
+                "description": "Select the best description of dynamic programming.",
+                "options": ["An optimization technique that solves problems by breaking them into overlapping subproblems and caching results", "A programming paradigm using dynamic typing", "A method for dynamic memory allocation", "A graph traversal technique"],
+                "correct_answer": "An optimization technique that solves problems by breaking them into overlapping subproblems and caching results",
+                "explanation": "DP avoids recomputation via memoization (top-down) or tabulation (bottom-up)."
+            },
+            {
+                "title": "What is the difference between a min-heap and a max-heap?",
+                "description": "Select the correct comparison.",
+                "options": ["Min-heap: root is smallest; max-heap: root is largest. Both maintain the heap property.", "They store elements in different orders but are otherwise identical", "Max-heap is faster for all operations", "Min-heap is only for integers"],
+                "correct_answer": "Min-heap: root is smallest; max-heap: root is largest. Both maintain the heap property.",
+                "explanation": "Heaps support O(log n) insert and O(log n) extract-min/max, useful in priority queues."
             },
         ],
     },
@@ -380,6 +562,20 @@ _TEMPLATES = {
                 "correct_answer": "A column that uniquely identifies each row in a table",
                 "explanation": "A primary key constraint ensures uniqueness and non-null values for a column or set of columns."
             },
+            {
+                "title": "What is normalization in databases?",
+                "description": "Select the correct answer about database normalization.",
+                "options": ["Organizing data to reduce redundancy and improve data integrity through normal forms", "Compressing the database file", "Encrypting sensitive columns", "Merging all tables into one"],
+                "correct_answer": "Organizing data to reduce redundancy and improve data integrity through normal forms",
+                "explanation": "Normal forms (1NF-3NF, BCNF) progressively eliminate update, insert, and delete anomalies."
+            },
+            {
+                "title": "What is a view in a database?",
+                "description": "Select the correct definition of a database view.",
+                "options": ["A virtual table defined by a stored query that can be queried like a regular table", "A physical copy of a table", "A cached query result", "A backup snapshot"],
+                "correct_answer": "A virtual table defined by a stored query that can be queried like a regular table",
+                "explanation": "Views simplify complex queries and can restrict access to underlying table data."
+            },
         ],
         "Medium": [
             {
@@ -389,6 +585,20 @@ _TEMPLATES = {
                 "correct_answer": "A data structure that improves query speed by reducing the amount of data to scan",
                 "explanation": "Indexes create a sorted reference to data, allowing faster lookups."
             },
+            {
+                "title": "What is denormalization?",
+                "description": "Select the correct description of denormalization.",
+                "options": ["Intentionally introducing redundancy to improve read performance at the cost of write complexity", "Removing all indexes from a table", "Splitting a table into multiple tables", "Encrypting database columns"],
+                "correct_answer": "Intentionally introducing redundancy to improve read performance at the cost of write complexity",
+                "explanation": "Denormalization is a trade-off used in high-read workloads to avoid expensive JOIN operations."
+            },
+            {
+                "title": "What is the N+1 query problem?",
+                "description": "Select the best description of the N+1 problem in databases.",
+                "options": ["Executing one query to fetch a list, then N additional queries for each item's related data — causing performance issues", "A SQL syntax error", "A problem with NULL values in N columns", "Running the same query twice by mistake"],
+                "correct_answer": "Executing one query to fetch a list, then N additional queries for each item's related data — causing performance issues",
+                "explanation": "Fix with eager loading (JOIN or ORM eager load) to fetch related data in a single query."
+            },
         ],
         "Hard": [
             {
@@ -397,6 +607,20 @@ _TEMPLATES = {
                 "options": ["Atomicity, Consistency, Isolation, Durability — properties ensuring reliable transactions", "Access, Control, Index, Data", "Automated, Concurrent, Integrated, Distributed", "Aggregate, Cluster, Index, Distribute"],
                 "correct_answer": "Atomicity, Consistency, Isolation, Durability — properties ensuring reliable transactions",
                 "explanation": "ACID properties guarantee database transactions are processed reliably."
+            },
+            {
+                "title": "What is CAP theorem?",
+                "description": "Select the correct statement of the CAP theorem.",
+                "options": ["A distributed system can guarantee at most two of: Consistency, Availability, Partition tolerance", "All distributed systems must sacrifice availability", "CAP stands for Cache, API, Persistence", "Consistency and availability are always achievable together"],
+                "correct_answer": "A distributed system can guarantee at most two of: Consistency, Availability, Partition tolerance",
+                "explanation": "CAP theorem guides trade-off decisions in distributed databases like Cassandra (AP) vs HBase (CP)."
+            },
+            {
+                "title": "What are database transaction isolation levels?",
+                "description": "Select the correct ordering of SQL isolation levels from weakest to strongest.",
+                "options": ["Read Uncommitted → Read Committed → Repeatable Read → Serializable", "Serializable → Read Committed → Read Uncommitted → Repeatable Read", "They are all equivalent", "Read Committed → Serializable → Read Uncommitted → Repeatable Read"],
+                "correct_answer": "Read Uncommitted → Read Committed → Repeatable Read → Serializable",
+                "explanation": "Higher isolation prevents more anomalies (dirty reads, non-repeatable reads, phantoms) but reduces concurrency."
             },
         ],
     },
@@ -531,13 +755,26 @@ def generate_question():
                 "correct_answer": f"Implement a well-structured solution demonstrating {topic} concepts.",
             }]
 
-    template = random.choice(templates)
+    # Shuffle and try all templates to find one not yet in the DB
+    shuffled = templates[:]
+    random.shuffle(shuffled)
 
-    # Check for duplicate titles — if exists, try another or return existing
-    existing = Question.query.filter_by(title=template["title"]).first()
-    if existing:
+    template = None
+    fallback_existing = None
+
+    for candidate in shuffled:
+        existing = Question.query.filter_by(title=candidate["title"]).first()
+        if not existing:
+            template = candidate
+            break
+        if fallback_existing is None:
+            fallback_existing = (existing, candidate)
+
+    if template is None:
+        # All templates for this combo already exist — return one of them
+        existing, candidate = fallback_existing
         result = existing.to_dict()
-        result["explanation"] = template.get("explanation", "")
+        result["explanation"] = candidate.get("explanation", "")
         result["already_existed"] = True
         return success_response(result, "Question already exists in bank")
 
