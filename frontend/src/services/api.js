@@ -7,7 +7,8 @@
 
 import axios from "axios";
 
-const BASE_URL = import.meta.env.VITE_API_URL;
+// const BASE_URL = import.meta.env.VITE_API_URL;
+const BASE_URL = "https://interviewpro-backend-pvzz.onrender.com";
 console.log("API Base URL :", BASE_URL);
 
 // Create Axios instance with default configuration
