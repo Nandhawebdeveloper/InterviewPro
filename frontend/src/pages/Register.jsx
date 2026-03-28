@@ -15,6 +15,7 @@ import * as Yup from "yup";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import LogoIcon from "../components/LogoIcon";
+import Toast from "../components/Toast";
 
 const registerSchema = Yup.object({
   name: Yup.string().min(3, "Name must be at least 3 characters").required("Name is required"),
@@ -49,13 +50,18 @@ const Register = () => {
 
   const [showPw, setShowPw] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const handleSubmit = useCallback(
     async (values, { setSubmitting, setStatus }) => {
       setStatus(null);
       try {
         await register(values.name, values.email, values.password);
-        navigate("/login", { replace: true });
+        setShowSuccess(true);
+        // Navigate after showing the success toast for 2 seconds
+        setTimeout(() => {
+          navigate("/login", { replace: true });
+        }, 2000);
       } catch (err) {
         setStatus(err.message || "Registration failed. Please try again.");
       } finally {
@@ -67,6 +73,12 @@ const Register = () => {
 
   return (
     <div className="auth-page">
+      <Toast
+        visible={showSuccess}
+        type="success"
+        message="✓ Successfully registered!"
+      />
+
       {/* Theme toggle */}
       <button
         className="auth-theme-toggle"
