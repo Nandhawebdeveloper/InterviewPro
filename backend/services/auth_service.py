@@ -31,14 +31,24 @@ def verify_password(plain_password, hashed_password):
 
     Args:
         plain_password (str): Plain-text password to check.
-        hashed_password (str): Stored bcrypt hash.
+        hashed_password (str): Stored bcrypt hash (or plain text for migration).
 
     Returns:
         bool: True if password matches, False otherwise.
     """
-    return bcrypt.checkpw(
-        plain_password.encode("utf-8"), hashed_password.encode("utf-8")
-    )
+    # Check if it's a valid bcrypt hash
+    if hashed_password.startswith(('$2a$', '$2b$', '$2y$')):
+        try:
+            return bcrypt.checkpw(
+                plain_password.encode("utf-8"), hashed_password.encode("utf-8")
+            )
+        except ValueError:
+            # Invalid bcrypt hash, fall back to plain text comparison
+            return plain_password == hashed_password
+    else:
+        # Plain text password (temporary migration support)
+        # TODO: Remove this after running fix_passwords.py migration
+        return plain_password == hashed_password
 
 
 def register_user(name, email, password, role="user"):
@@ -91,5 +101,11 @@ def authenticate_user(email, password):
 
     if not verify_password(password, user.password):
         return None, "Invalid email or password"
+
+    # Auto-migrate plain text passwords to bcrypt hashes
+    if not user.password.startswith(('$2a$', '$2b$', '$2y$')):
+        print(f"Auto-migrating password hash for user: {user.email}")
+        user.password = hash_password(password)
+        db.session.commit()
 
     return user, None
