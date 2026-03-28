@@ -34,7 +34,7 @@ class Config:
 
     # CORS allowed origins
     CORS_ORIGINS = os.environ.get(
-        "CORS_ORIGINS", "http://localhost:5173,http://localhost:3000"
+        "CORS_ORIGINS", "http://localhost:5173,http://localhost:3000,https://interview-pro-prep.vercel.app"
     ).split(",")
 
 
