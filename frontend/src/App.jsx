@@ -14,6 +14,7 @@ import { ThemeProvider } from "./context/ThemeContext";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
 import ProtectedRoute from "./components/ProtectedRoute";
+import IdleWarning from "./components/IdleWarning";
 
 // Pages
 import Home from "./pages/Home";
@@ -46,6 +47,9 @@ const AppInner = () => {
   return (
     <div className="app-container">
       {isAuthenticated && <Navbar onMenuToggle={() => setSidebarOpen((v) => !v)} />}
+      
+      {/* Idle timeout warning - shows globally when user is about to be logged out */}
+      {isAuthenticated && <IdleWarning />}
 
       <div className={isAuthenticated ? "app-body" : ""}>
         {isAuthenticated && <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(false)} />}

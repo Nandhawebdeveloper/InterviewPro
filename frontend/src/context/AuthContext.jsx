@@ -5,7 +5,7 @@
  * Handles login, logout, registration, and token persistence.
  */
 
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useRef } from "react";
 import endpoints from "../services/endpoints";
 
 const AuthContext = createContext(null);
@@ -28,6 +28,80 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  
+  // Idle timer state
+  const [idleTime, setIdleTime] = useState(0);
+  const idleTimeoutRef = useRef(null);
+  const IDLE_TIMEOUT = 30 * 60 * 1000; // 30 minutes in milliseconds
+
+  // Reset idle timer on user activity
+  const resetIdleTimer = () => {
+    setIdleTime(0);
+    if (idleTimeoutRef.current) {
+      clearTimeout(idleTimeoutRef.current);
+    }
+    if (user) {
+      idleTimeoutRef.current = setTimeout(() => {
+        console.log("Idle timeout reached, logging out...");
+        logout();
+      }, IDLE_TIMEOUT);
+    }
+  };
+
+  // Clear idle timer
+  const clearIdleTimer = () => {
+    if (idleTimeoutRef.current) {
+      clearTimeout(idleTimeoutRef.current);
+      idleTimeoutRef.current = null;
+    }
+  };
+
+  // Set up activity event listeners
+  useEffect(() => {
+    if (!user) {
+      clearIdleTimer();
+      return;
+    }
+
+    const events = [
+      'mousedown',
+      'mousemove',
+      'keypress',
+      'scroll',
+      'touchstart',
+      'click',
+      'keydown'
+    ];
+
+    const handleActivity = () => resetIdleTimer();
+
+    // Add event listeners
+    events.forEach(event => {
+      document.addEventListener(event, handleActivity, true);
+    });
+
+    // Start initial timer
+    resetIdleTimer();
+
+    // Cleanup function
+    return () => {
+      events.forEach(event => {
+        document.removeEventListener(event, handleActivity, true);
+      });
+      clearIdleTimer();
+    };
+  }, [user]); // Re-run when user changes
+
+  // Update idle time every second for UI feedback
+  useEffect(() => {
+    if (!user) return;
+
+    const interval = setInterval(() => {
+      setIdleTime(prev => prev + 1000);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [user]);
 
   // Runs ONCE on mount — restores session from localStorage
   useEffect(() => {
@@ -87,6 +161,7 @@ export const AuthProvider = ({ children }) => {
    * Logout user and clear session.
    */
   const logout = () => {
+    clearIdleTimer();
     localStorage.removeItem("token");
     setUser(null);
   };
@@ -98,6 +173,9 @@ export const AuthProvider = ({ children }) => {
     register,
     logout,
     isAuthenticated: !!user,
+    idleTime,
+    idleTimeout: IDLE_TIMEOUT,
+    resetIdleTimer,
     isAdmin: user?.role === "admin",
   };
 
