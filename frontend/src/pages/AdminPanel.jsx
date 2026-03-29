@@ -14,6 +14,7 @@ import { useState, useEffect } from "react";
 import { Formik, Form, Field, ErrorMessage, FieldArray } from "formik";
 import * as Yup from "yup";
 import endpoints from "../services/endpoints";
+import ConfirmModal from "../components/ConfirmModal";
 
 const questionSchema = Yup.object({
   title: Yup.string().trim().required("Title is required"),
@@ -57,6 +58,14 @@ const AdminPanel = () => {
   /* Sorting */
   const [sortBy, setSortBy] = useState("id");
   const [sortDir, setSortDir] = useState("asc");
+
+  /* Reusable confirm dialog state */
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmTitle, setConfirmTitle] = useState("");
+  const [confirmMessage, setConfirmMessage] = useState("");
+  const [confirmAction, setConfirmAction] = useState(() => () => {});
+  const [confirmCancelAction, setConfirmCancelAction] = useState(() => () => {});
+
 
   const handleSort = (col) => {
     if (sortBy === col) {
@@ -211,26 +220,38 @@ const AdminPanel = () => {
     fetchQuestions();
   };
 
-  const handleDeleteQuestion = async (id) => {
-    if (!window.confirm("Delete this question permanently?")) return;
-    const res = await endpoints.deleteQuestion(id);
-    if (!res.success) {
-      setError(res.message);
-      return;
-    }
-    setSuccess("Question deleted.");
-    fetchQuestions();
+  const handleDeleteQuestion = (id) => {
+    setConfirmTitle("Delete Question");
+    setConfirmMessage("Delete this question permanently?");
+    setConfirmAction(async () => {
+      setConfirmOpen(false);
+      const res = await endpoints.deleteQuestion(id);
+      if (!res.success) {
+        setError(res.message);
+        return;
+      }
+      setSuccess("Question deleted.");
+      fetchQuestions();
+    });
+    setConfirmCancelAction(() => () => setConfirmOpen(false));
+    setConfirmOpen(true);
   };
 
-  const handleDeleteUser = async (id) => {
-    if (!window.confirm("Delete this user account permanently?")) return;
-    const res = await endpoints.deleteUser(id);
-    if (!res.success) {
-      setError(res.message);
-      return;
-    }
-    setSuccess("User deleted.");
-    fetchUsers();
+  const handleDeleteUser = (id) => {
+    setConfirmTitle("Delete User");
+    setConfirmMessage("Delete this user account permanently?");
+    setConfirmAction(async () => {
+      setConfirmOpen(false);
+      const res = await endpoints.deleteUser(id);
+      if (!res.success) {
+        setError(res.message);
+        return;
+      }
+      setSuccess("User deleted.");
+      fetchUsers();
+    });
+    setConfirmCancelAction(() => () => setConfirmOpen(false));
+    setConfirmOpen(true);
   };
 
   /* ────────────────── Render ────────────────── */
@@ -679,6 +700,18 @@ const AdminPanel = () => {
           </div>
         </div>
       )}
+      <ConfirmModal
+        open={confirmOpen}
+        title={confirmTitle}
+        message={confirmMessage}
+        confirmText="Yes"
+        cancelText="Cancel"
+        onConfirm={confirmAction}
+        onCancel={() => {
+          setConfirmOpen(false);
+          confirmCancelAction();
+        }}
+      />
     </div>
   );
 };

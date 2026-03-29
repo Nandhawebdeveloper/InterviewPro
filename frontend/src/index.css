@@ -2898,7 +2898,7 @@ tbody tr:hover td {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.7rem 1rem;
+  padding: 5px 16px;
   border-radius: var(--radius);
   color: var(--text-secondary);
   font-size: 0.875rem;

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import endpoints from "../services/endpoints";
+import ConfirmModal from "../components/ConfirmModal";
 
 const MockInterview = () => {
   const [stage, setStage] = useState("setup"); // setup | interview | result
@@ -12,6 +13,9 @@ const MockInterview = () => {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState([]);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmMessage, setConfirmMessage] = useState("");
+  const [confirmAction, setConfirmAction] = useState(() => () => {});
   const timerRef = useRef(null);
 
   useEffect(() => {
@@ -91,9 +95,11 @@ const MockInterview = () => {
   };
 
   const handleDiscard = async (id) => {
-    if (!window.confirm("Discard this in-progress interview?")) return;
-    const res = await endpoints.deleteInterview(id);
-    if (res.success) loadHistory();
+    showConfirm("Discard this in-progress interview?", async () => {
+      const res = await endpoints.deleteInterview(id);
+      if (res.success) loadHistory();
+      hideConfirm();
+    });
   };
 
   const handleViewResult = async (id) => {
@@ -112,12 +118,29 @@ const MockInterview = () => {
     return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
   };
 
+  const showConfirm = (message, action) => {
+    setConfirmMessage(message);
+    setConfirmAction(() => action);
+    setConfirmOpen(true);
+  };
+
+  const hideConfirm = () => setConfirmOpen(false);
+
   const currentQ = questions[currentIdx];
 
   // ─── SETUP ───
   if (stage === "setup") {
     return (
       <div className="mock-interview-page">
+        <ConfirmModal
+          open={confirmOpen}
+          title="Confirm"
+          message={confirmMessage}
+          onConfirm={confirmAction}
+          onCancel={hideConfirm}
+          confirmText="Yes"
+          cancelText="No"
+        />
         <div className="page-header">
           <h1>🎤 Mock Interview</h1>
           <p className="text-secondary">Simulate a real interview with timed questions and scoring</p>
@@ -272,6 +295,15 @@ const MockInterview = () => {
   if (stage === "interview") {
     return (
       <div className="mock-interview-page">
+        <ConfirmModal
+          open={confirmOpen}
+          title="Confirm"
+          message={confirmMessage}
+          onConfirm={confirmAction}
+          onCancel={hideConfirm}
+          confirmText="Yes"
+          cancelText="No"
+        />
         {/* Timer bar */}
         <div className="interview-timer-bar">
           <div className="interview-timer-info">
@@ -373,6 +405,15 @@ const MockInterview = () => {
   if (stage === "result" && result) {
     return (
       <div className="mock-interview-page">
+        <ConfirmModal
+          open={confirmOpen}
+          title="Confirm"
+          message={confirmMessage}
+          onConfirm={confirmAction}
+          onCancel={hideConfirm}
+          confirmText="Yes"
+          cancelText="No"
+        />
         <div className="page-header">
           <h1>📊 Interview Results</h1>
         </div>
