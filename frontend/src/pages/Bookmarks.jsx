@@ -19,6 +19,10 @@ const Bookmarks = () => {
 
   const fetchBookmarks = async () => {
     const res = await endpoints.getBookmarks();
+
+    // For debug display in component (as requested) in attached format style:
+    console.log("📤 API response:", res);
+
     if (!res.success) {
       setError(res.message);
       setLoading(false);
@@ -30,6 +34,7 @@ const Bookmarks = () => {
 
   const handleRemove = async (bookmarkId) => {
     const res = await endpoints.removeBookmark(bookmarkId);
+    console.log("Remove bookmark response:", res);
     if (!res.success) {
       setError(res.message);
       return;
