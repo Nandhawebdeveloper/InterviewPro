@@ -73,11 +73,7 @@ const Register = () => {
 
   return (
     <div className="auth-page">
-      <Toast
-        visible={showSuccess}
-        type="success"
-        message="✓ Successfully registered!"
-      />
+      <Toast visible={showSuccess} type="success" message="✓ Successfully registered!" />
 
       {/* Theme toggle */}
       <button
@@ -120,6 +116,7 @@ const Register = () => {
                 <div className="form-group">
                   <label htmlFor="name">Full name</label>
                   <Field
+                    autoFocus
                     id="name"
                     name="name"
                     type="text"

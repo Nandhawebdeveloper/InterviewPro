@@ -5,11 +5,14 @@ Provides CRUD endpoints for interview questions.
 Admin-only access for create, update, and delete operations.
 """
 
+import random
+
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from extensions import db
 from models.question_model import Question
+from models.attempt_model import Attempt
 from utils.validators import validate_question
 from utils.response import success_response, error_response
 from utils.decorators import admin_required
@@ -32,8 +35,10 @@ def get_questions():
     difficulty = request.args.get("difficulty")
     topic = request.args.get("topic")
     search = request.args.get("search", "").strip()
+    exclude_solved = request.args.get("exclude_solved", "").lower() == "true"
+    randomize = request.args.get("randomize", "").lower() == "true"
     page = request.args.get("page", 1, type=int)
-    per_page = request.args.get("per_page", request.args.get("limit", 20, type=int), type=int)
+    per_page = request.args.get("per_page", request.args.get("limit", 10, type=int), type=int)
     per_page = min(per_page, 100)  # cap at 100
 
     # Build query with filters
@@ -54,20 +59,69 @@ def get_questions():
             )
         )
 
-    # Paginate results
+    # Exclude already-solved questions
+    user_id = int(get_jwt_identity())
+    solved_ids = []
+    if exclude_solved:
+        solved_subq = (
+            db.session.query(Attempt.question_id)
+            .filter(Attempt.user_id == user_id)
+            .distinct()
+        )
+        query = query.filter(~Question.id.in_(solved_subq))
+
+    # Get solved question IDs for labeling (always)
+    solved_ids = [
+        r[0] for r in
+        db.session.query(Attempt.question_id)
+        .filter(Attempt.user_id == user_id)
+        .distinct()
+        .all()
+    ]
+
+    # Fetch and return results (randomized or chronological)
+    if randomize:
+        all_questions = query.all()
+        random.shuffle(all_questions)
+        total = len(all_questions)
+        start = (page - 1) * per_page
+        page_questions = all_questions[start:start + per_page]
+        total_pages = (total + per_page - 1) // per_page if total else 1
+
+        return success_response(
+            {
+                "questions": [
+                    {**q.to_dict(), "is_attempted": q.id in solved_ids}
+                    for q in page_questions
+                ],
+                "total": total,
+                "page": page,
+                "total_pages": total_pages,
+                "results": len(page_questions),
+                "pages": total_pages,
+                "current_page": page,
+                "solved_ids": solved_ids,
+            },
+            "Questions retrieved",
+        )
+
     pagination = query.order_by(Question.created_at.desc()).paginate(
         page=page, per_page=per_page, error_out=False
     )
 
     return success_response(
         {
-            "questions": [q.to_dict() for q in pagination.items],
+            "questions": [
+                {**q.to_dict(), "is_attempted": q.id in solved_ids}
+                for q in pagination.items
+            ],
             "total": pagination.total,
             "page": pagination.page,
             "total_pages": pagination.pages,
             "results": len(pagination.items),
             "pages": pagination.pages,
             "current_page": pagination.page,
+            "solved_ids": solved_ids,
         },
         "Questions retrieved",
     )

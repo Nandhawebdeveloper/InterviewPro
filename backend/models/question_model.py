@@ -23,6 +23,7 @@ class Question(db.Model):
     topic = db.Column(db.String(100), nullable=False)
     options = db.Column(db.JSON, nullable=True)  # JSON array for MCQ options
     correct_answer = db.Column(db.Text, nullable=False)
+    is_ai_generated = db.Column(db.Boolean, default=False, nullable=False)
     created_by = db.Column(db.Integer, db.ForeignKey("users.id", ondelete="SET NULL"))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -40,6 +41,7 @@ class Question(db.Model):
             "topic": self.topic,
             "options": self.options,
             "correct_answer": self.correct_answer,
+            "is_ai_generated": self.is_ai_generated,
             "created_by": self.created_by,
             "created_at": self.created_at.isoformat() if self.created_at else None,
         }
@@ -54,6 +56,7 @@ class Question(db.Model):
             "difficulty": self.difficulty,
             "topic": self.topic,
             "options": self.options,
+            "is_ai_generated": self.is_ai_generated,
             "created_at": self.created_at.isoformat() if self.created_at else None,
         }
 

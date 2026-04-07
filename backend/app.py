@@ -107,6 +107,7 @@ def create_app(config_name=None):
     from routes.roadmap_routes import roadmap_bp
     from routes.interview_routes import interview_bp
     from routes.badge_routes import badge_bp
+    from routes.ai_routes import ai_bp
 
     app.register_blueprint(auth_bp, url_prefix="/api")
     app.register_blueprint(question_bp, url_prefix="/api")
@@ -120,6 +121,7 @@ def create_app(config_name=None):
     app.register_blueprint(roadmap_bp, url_prefix="/api")
     app.register_blueprint(interview_bp, url_prefix="/api")
     app.register_blueprint(badge_bp, url_prefix="/api")
+    app.register_blueprint(ai_bp, url_prefix="/api")
 
     # ---- Error Handlers ----
     @app.errorhandler(404)
@@ -177,6 +179,7 @@ def create_app(config_name=None):
         from models.discussion_vote_model import DiscussionVote
         from models.badge_model import Badge, UserBadge
         from models.mock_interview_model import MockInterview
+        from models.ai_usage_model import AIUsage
 
         db.create_all()
 

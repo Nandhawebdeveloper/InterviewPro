@@ -160,7 +160,7 @@ const getRecommendations = () => apiService.get("/api/dashboard/recommendations"
 // ─────────────────────────────────────────────
 
 /**
- * Generate a new question using AI templates.
+ * Generate a new question using local templates.
  * @param {string} topic
  * @param {string} difficulty
  * @param {string} type - "MCQ" or "CODING"
@@ -168,6 +168,22 @@ const getRecommendations = () => apiService.get("/api/dashboard/recommendations"
  */
 const generateQuestion = (topic, difficulty, type) =>
   apiService.post("/api/questions/generate", { topic, difficulty, type });
+
+/**
+ * Generate a question using OpenAI API with daily limits and fallback.
+ * @param {string} topic
+ * @param {string} difficulty
+ * @param {string} type - "MCQ" or "CODING"
+ * @returns {{ question, usage: { used, limit, remaining } }}
+ */
+const aiGenerateQuestion = (topic, difficulty, type) =>
+  apiService.post("/api/ai/generate", { topic, difficulty, type });
+
+/**
+ * Get AI usage stats for today.
+ * @returns {{ used, limit, remaining, date }}
+ */
+const getAIUsage = () => apiService.get("/api/ai/usage");
 
 // ─────────────────────────────────────────────
 // PROFILE
@@ -322,6 +338,8 @@ const endpoints = {
   getRecommendations,
   // AI Generator
   generateQuestion,
+  aiGenerateQuestion,
+  getAIUsage,
   // Profile
   getProfile,
   updateProfile,

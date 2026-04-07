@@ -8,7 +8,7 @@
 
 const LETTERS = ["A", "B", "C", "D", "E", "F"];
 
-const QuestionCard = ({ question, selectedAnswer, onSelectAnswer, submitted, result }) => {
+const QuestionCard = ({ question, selectedAnswer, onSelectAnswer, submitted, result, showAnswer }) => {
   const isMCQ = question.type === "MCQ";
 
   const getOptionClass = (option) => {
@@ -16,6 +16,8 @@ const QuestionCard = ({ question, selectedAnswer, onSelectAnswer, submitted, res
     if (submitted && result) {
       if (option === result.correct_answer) cls += " correct";
       else if (option === selectedAnswer && !result.is_correct) cls += " incorrect";
+    } else if (showAnswer && option === question.correct_answer) {
+      cls += " correct";
     } else if (option === selectedAnswer) {
       cls += " selected";
     }
@@ -67,17 +69,21 @@ const QuestionCard = ({ question, selectedAnswer, onSelectAnswer, submitted, res
       {/* ── MCQ Options ── */}
       {isMCQ && question.options && (
         <ul className="option-list">
-          {question.options.map((option, idx) => (
-            <li
-              key={idx}
-              className={getOptionClass(option)}
-              onClick={() => !submitted && onSelectAnswer(option)}
-              style={{ cursor: submitted ? "default" : "pointer" }}
-            >
-              <span className="option-letter">{LETTERS[idx]}</span>
-              {option}
-            </li>
-          ))}
+          {question.options.map((option, idx) => {
+            const display = option.length > 120 ? option.slice(0, 120) + "…" : option;
+            return (
+              <li
+                key={idx}
+                className={getOptionClass(option)}
+                onClick={() => !submitted && onSelectAnswer(option)}
+                style={{ cursor: submitted ? "default" : "pointer" }}
+                title={option.length > 120 ? option : undefined}
+              >
+                <span className="option-letter">{LETTERS[idx]}</span>
+                {display}
+              </li>
+            );
+          })}
         </ul>
       )}
 
@@ -105,11 +111,28 @@ const QuestionCard = ({ question, selectedAnswer, onSelectAnswer, submitted, res
           ) : (
             <>
               ❌ Incorrect.{" "}
-              <span>
-                Correct answer: <strong>{result.correct_answer}</strong>
+              <span title={result.correct_answer.length > 100 ? result.correct_answer : undefined}>
+                Correct answer:{" "}
+                <strong>
+                  {result.correct_answer.length > 100
+                    ? result.correct_answer.slice(0, 100) + "…"
+                    : result.correct_answer}
+                </strong>
               </span>
             </>
           )}
+        </div>
+      )}
+
+      {/* ── Previously Solved Answer ── */}
+      {showAnswer && !submitted && (
+        <div className="result-banner correct" style={{ opacity: 0.85 }}>
+          ✅ Previously solved — Correct answer:{" "}
+          <strong title={question.correct_answer.length > 100 ? question.correct_answer : undefined}>
+            {question.correct_answer.length > 100
+              ? question.correct_answer.slice(0, 100) + "…"
+              : question.correct_answer}
+          </strong>
         </div>
       )}
     </div>

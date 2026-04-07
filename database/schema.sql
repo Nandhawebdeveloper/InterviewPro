@@ -80,6 +80,25 @@ ALTER TABLE users ADD COLUMN longest_streak INT DEFAULT 0;
 ALTER TABLE users ADD COLUMN last_practice_date DATE DEFAULT NULL;
 
 -- ============================================================
+-- AI-generated flag on questions
+-- ============================================================
+ALTER TABLE questions ADD COLUMN is_ai_generated BOOLEAN DEFAULT FALSE;
+
+-- ============================================================
+-- AI Usage Tracking Table
+-- Limits AI question generation to 5 per user per day
+-- ============================================================
+CREATE TABLE ai_usage (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    usage_date DATE NOT NULL,
+    count INT NOT NULL DEFAULT 0,
+
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE KEY uq_user_date (user_id, usage_date)
+) ENGINE=InnoDB;
+
+-- ============================================================
 -- Full-text search support on questions
 -- ============================================================
 ALTER TABLE questions ADD FULLTEXT INDEX ft_questions_search (title, description);
