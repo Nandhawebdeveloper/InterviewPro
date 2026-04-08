@@ -35,7 +35,7 @@ def get_leaderboard():
             func.sum(case((Attempt.is_correct == True, 1), else_=0)).label("correct"),
         )
         .join(Attempt, User.id == Attempt.user_id)
-        .filter(User.role == "user")
+        .filter((User.role == "user") | (User.role == "admin"))
         .group_by(User.id, User.name)
         .having(func.count(Attempt.id) >= 5)
         .order_by(
