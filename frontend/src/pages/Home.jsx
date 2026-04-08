@@ -290,6 +290,9 @@ const Home = () => {
             <Link to="/login" className="landing-nav-link" onClick={closeMenu}>
               Login
             </Link>
+            <Link to="/register" className="landing-nav-link landing-mobile-cta" onClick={closeMenu}>
+              🚀 Get Started
+            </Link>
           </div>
 
           {/* Actions */}
@@ -354,7 +357,7 @@ const Home = () => {
               </div>
               <div className="landing-stat-divider" />
               <div className="landing-stat">
-                <span className="landing-stat-val">500+</span>
+                <span className="landing-stat-val">1500+</span>
                 <span className="landing-stat-lbl">Questions</span>
               </div>
               <div className="landing-stat-divider" />

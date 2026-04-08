@@ -235,39 +235,25 @@ const Practice = () => {
       {/* ── AI Question Generator ── */}
       {showGenerator && (
         <div className="card ai-generator-card" style={{ marginBottom: "1.5rem" }}>
-          <div
-            className="card-header"
-            style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
-          >
+          <div className="card-header ai-gen-header">
             <span>🤖 AI Question Generator</span>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+            <div className="ai-gen-controls">
               {/* AI Usage Counter */}
-              <span
-                style={{
-                  fontSize: "0.8rem",
-                  padding: "0.25rem 0.6rem",
-                  borderRadius: "12px",
-                  background: aiUsage.remaining > 0 ? "rgba(99, 102, 241, 0.15)" : "rgba(239, 68, 68, 0.15)",
-                  color: aiUsage.remaining > 0 ? "var(--primary)" : "var(--danger)",
-                  fontWeight: 600,
-                }}
-              >
+              <span className={`ai-gen-usage ${aiUsage.remaining <= 0 ? "ai-gen-usage-empty" : ""}`}>
                 ⚡ {aiUsage.remaining}/{aiUsage.limit} AI left today
               </span>
               {/* Mode Toggle */}
-              <div style={{ display: "flex", gap: "0.25rem" }}>
+              <div className="ai-gen-mode-toggle">
                 <button
                   type="button"
-                  className={`btn ${genMode === "ai" ? "btn-primary" : "btn-outline"}`}
-                  style={{ padding: "0.25rem 0.6rem", fontSize: "0.75rem" }}
+                  className={`btn ${genMode === "ai" ? "btn-primary" : "btn-outline"} ai-gen-mode-btn`}
                   onClick={() => setGenMode("ai")}
                 >
                   🧠 AI (OpenAI)
                 </button>
                 <button
                   type="button"
-                  className={`btn ${genMode === "template" ? "btn-primary" : "btn-outline"}`}
-                  style={{ padding: "0.25rem 0.6rem", fontSize: "0.75rem" }}
+                  className={`btn ${genMode === "template" ? "btn-primary" : "btn-outline"} ai-gen-mode-btn`}
                   onClick={() => setGenMode("template")}
                 >
                   📋 Template
@@ -556,52 +542,19 @@ const Practice = () => {
           </div>
 
           {/* Counter + Labels + Bookmark */}
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <div className="question-header-row">
+            <div className="question-labels">
               <p className="question-number">
                 Question {currentIndex + 1} of {questions.length}
               </p>
               {/* Question Status Labels */}
               {solvedIds.has(currentQuestion.id) || currentQuestion.is_attempted ? (
-                <span
-                  style={{
-                    fontSize: "0.7rem",
-                    padding: "0.15rem 0.5rem",
-                    borderRadius: "10px",
-                    background: "rgba(245, 158, 11, 0.15)",
-                    color: "#f59e0b",
-                    fontWeight: 600,
-                  }}
-                >
-                  Previously Attempted
-                </span>
+                <span className="question-status-badge badge-attempted">Previously Attempted</span>
               ) : (
-                <span
-                  style={{
-                    fontSize: "0.7rem",
-                    padding: "0.15rem 0.5rem",
-                    borderRadius: "10px",
-                    background: "rgba(34, 197, 94, 0.15)",
-                    color: "#22c55e",
-                    fontWeight: 600,
-                  }}
-                >
-                  New Question
-                </span>
+                <span className="question-status-badge badge-new">New Question</span>
               )}
               {currentQuestion.is_ai_generated && (
-                <span
-                  style={{
-                    fontSize: "0.7rem",
-                    padding: "0.15rem 0.5rem",
-                    borderRadius: "10px",
-                    background: "linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(99, 102, 241, 0.15))",
-                    color: "#8b5cf6",
-                    fontWeight: 600,
-                  }}
-                >
-                  🧠 AI Generated
-                </span>
+                <span className="question-status-badge badge-ai">🧠 AI Generated</span>
               )}
             </div>
             <button
@@ -623,15 +576,7 @@ const Practice = () => {
           />
 
           {/* ── Action Row ── */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginTop: "1.5rem",
-              gap: "0.75rem",
-            }}
-          >
+          <div className="question-action-row">
             <button className="btn btn-outline" onClick={handlePrevious} disabled={currentIndex === 0}>
               ← Previous
             </button>
