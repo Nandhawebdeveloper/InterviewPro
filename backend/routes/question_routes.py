@@ -16,6 +16,7 @@ from models.attempt_model import Attempt
 from utils.validators import validate_question
 from utils.response import success_response, error_response
 from utils.decorators import admin_required
+from utils.feature_access import _get_effective_plan, FEATURE_ACCESS, FREE_TOPICS
 
 # Create blueprint for question routes
 question_bp = Blueprint("questions", __name__)
@@ -61,6 +62,18 @@ def get_questions():
 
     # Exclude already-solved questions
     user_id = int(get_jwt_identity())
+
+    # Enforce topic restriction for free-plan users
+    from flask import current_app
+    if current_app.config.get("PAYMENT_GATEWAY_ENABLED"):
+        from models.user_model import User
+        user = User.query.get(user_id)
+        if user:
+            plan = _get_effective_plan(user)
+            access = FEATURE_ACCESS.get(plan, FEATURE_ACCESS["free"])
+            if access.get("topics_limit"):
+                query = query.filter(Question.topic.in_(FREE_TOPICS))
+
     solved_ids = []
     if exclude_solved:
         solved_subq = (

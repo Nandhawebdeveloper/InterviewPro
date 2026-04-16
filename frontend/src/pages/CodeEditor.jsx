@@ -1,7 +1,9 @@
 import { useState, useRef } from "react";
 import Editor from "@monaco-editor/react";
 import { useTheme } from "../context/ThemeContext";
+import { useAuth } from "../context/AuthContext";
 import endpoints from "../services/endpoints";
+import UpgradeModal from "../components/UpgradeModal";
 
 const LANGUAGES = [
   { value: "python", label: "Python", defaultCode: '# Write your Python code here\nprint("Hello, World!")' },
@@ -14,12 +16,16 @@ const LANGUAGES = [
 
 const CodeEditor = () => {
   const { theme } = useTheme();
+  const { features, paymentEnabled } = useAuth();
   const [language, setLanguage] = useState("python");
   const [code, setCode] = useState(LANGUAGES[0].defaultCode);
   const [output, setOutput] = useState("");
   const [error, setError] = useState("");
   const [running, setRunning] = useState(false);
+  const [showUpgrade, setShowUpgrade] = useState(false);
   const editorRef = useRef(null);
+
+  const isLocked = paymentEnabled && features && !features.coding;
 
   const handleLanguageChange = (lang) => {
     setLanguage(lang);
@@ -58,6 +64,15 @@ const CodeEditor = () => {
 
   return (
     <div className="code-editor-page">
+      <UpgradeModal isOpen={showUpgrade} onClose={() => setShowUpgrade(false)} feature="Code Editor" />
+      {isLocked && (
+        <div className="feature-locked-banner">
+          <span>🔒 Code Editor is a Pro feature.</span>
+          <button className="btn btn-primary btn-sm" onClick={() => setShowUpgrade(true)}>
+            Upgrade to Pro
+          </button>
+        </div>
+      )}
       <div className="page-header">
         <h1>💻 Code Editor</h1>
         <p className="text-secondary">Write and run code directly in your browser</p>
@@ -84,8 +99,12 @@ const CodeEditor = () => {
             <button className="btn btn-sm btn-outline" onClick={handleClear}>
               🗑️ Clear Output
             </button>
-            <button className="btn btn-sm btn-primary" onClick={handleRun} disabled={running || !code.trim()}>
-              {running ? "⏳ Running..." : "▶ Run Code"}
+            <button
+              className="btn btn-sm btn-primary"
+              onClick={handleRun}
+              disabled={running || !code.trim() || isLocked}
+            >
+              {running ? "⏳ Running..." : isLocked ? "🔒 Pro Only" : "▶ Run Code"}
             </button>
           </div>
         </div>

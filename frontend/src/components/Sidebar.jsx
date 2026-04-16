@@ -7,9 +7,10 @@
 
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import PlanBadge from "./PlanBadge";
 
 const Sidebar = ({ isOpen, onToggle }) => {
-  const { user, isAdmin, logout } = useAuth();
+  const { user, isAdmin, logout, paymentEnabled, isFree, features } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -25,11 +26,13 @@ const Sidebar = ({ isOpen, onToggle }) => {
         .join("")
     : "U";
 
+  const proLocked = paymentEnabled && isFree;
+
   const links = [
     { to: "/dashboard", icon: "📊", label: "Dashboard" },
     { to: "/practice", icon: "✏️", label: "Practice" },
-    { to: "/code-editor", icon: "💻", label: "Code Editor" },
-    { to: "/mock-interview", icon: "🎤", label: "Mock Interview" },
+    { to: "/code-editor", icon: "💻", label: "Code Editor", locked: proLocked && !features?.coding },
+    { to: "/mock-interview", icon: "🎤", label: "Mock Interview", locked: proLocked && !features?.mock_interview },
     { to: "/roadmap", icon: "🗺️", label: "Study Roadmap" },
     { to: "/bookmarks", icon: "🔖", label: "Bookmarks" },
     { to: "/badges", icon: "🏆", label: "Badges" },
@@ -40,6 +43,10 @@ const Sidebar = ({ isOpen, onToggle }) => {
     links.push({ to: "/admin", icon: "⚙️", label: "Admin Panel" });
   }
 
+  if (paymentEnabled) {
+    links.push({ to: "/pricing", icon: "💎", label: isFree ? "✨ Upgrade" : "Pricing" });
+  }
+
   return (
     <>
       {/* Mobile overlay */}
@@ -48,17 +55,20 @@ const Sidebar = ({ isOpen, onToggle }) => {
       <aside className={`sidebar ${isOpen ? "sidebar-open" : ""}`}>
         <div className="sidebar-content">
           <nav className="sidebar-nav">
-            {links.map(({ to, icon, label }) => (
+            {links.map(({ to, icon, label, locked }) => (
               <NavLink
                 key={to}
                 to={to}
-                className={({ isActive }) => `sidebar-link${isActive ? " active" : ""}`}
+                className={({ isActive }) =>
+                  `sidebar-link${isActive ? " active" : ""}${locked ? " sidebar-link-locked" : ""}`
+                }
                 onClick={() => {
                   if (window.innerWidth < 768) onToggle();
                 }}
               >
                 <span className="sidebar-link-icon">{icon}</span>
                 <span className="sidebar-link-label">{label}</span>
+                {locked && <span className="sidebar-lock-icon">🔒</span>}
               </NavLink>
             ))}
           </nav>
@@ -69,7 +79,9 @@ const Sidebar = ({ isOpen, onToggle }) => {
           <NavLink to="/profile" className="sidebar-user" title="View Profile">
             <div className="sidebar-user-avatar">{initials}</div>
             <div className="sidebar-user-info">
-              <span className="sidebar-user-name">{user?.name || "User"}</span>
+              <span className="sidebar-user-name">
+                {user?.name || "User"} <PlanBadge />
+              </span>
               <span className="sidebar-user-role">{isAdmin ? "Admin" : "Member"}</span>
             </div>
             <svg

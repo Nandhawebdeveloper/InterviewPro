@@ -21,6 +21,7 @@ from extensions import db
 from models.question_model import Question
 from models.ai_usage_model import AIUsage
 from utils.response import success_response, error_response
+from utils.feature_access import check_feature_access
 
 logger = logging.getLogger(__name__)
 
@@ -171,6 +172,7 @@ Requirements:
 # ─────────────────────────────────────────────
 @ai_bp.route("/ai/generate", methods=["POST"])
 @jwt_required()
+@check_feature_access("ai_feedback")
 def ai_generate_question():
     """
     Generate a question using OpenAI API with daily limits and fallback.

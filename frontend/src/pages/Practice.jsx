@@ -22,8 +22,11 @@ import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import Switch from "react-switch";
 import endpoints from "../services/endpoints";
+import { useAuth } from "../context/AuthContext";
 import QuestionCard from "../components/QuestionCard";
 import Discussions from "../components/Discussions";
+import UsageBar from "../components/UsageBar";
+import UpgradeModal from "../components/UpgradeModal";
 
 const aiGeneratorSchema = Yup.object({
   topic: Yup.string().required("Topic is required"),
@@ -32,6 +35,7 @@ const aiGeneratorSchema = Yup.object({
 });
 
 const Practice = () => {
+  const { features, paymentEnabled, refreshFeatures } = useAuth();
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -62,6 +66,14 @@ const Practice = () => {
   const [genResult, setGenResult] = useState(null);
   const [aiUsage, setAiUsage] = useState({ used: 0, limit: 5, remaining: 5 });
   const [genMode, setGenMode] = useState("ai"); // "ai" or "template"
+
+  const [showUpgrade, setShowUpgrade] = useState(false);
+  const aiLocked = paymentEnabled && features && !features.ai_feedback;
+  const dailyLimitReached =
+    paymentEnabled &&
+    features &&
+    features.daily_question_limit !== null &&
+    (features.questions_used_today || 0) >= features.daily_question_limit;
 
   useEffect(() => {
     fetchTopics();
@@ -131,6 +143,9 @@ const Practice = () => {
     const currentQuestion = questions[currentIndex];
     const res = await endpoints.submitAttempt(currentQuestion.id, selectedAnswer);
     if (!res.success) {
+      if (res.code === "DAILY_LIMIT_REACHED") {
+        refreshFeatures();
+      }
       setError(res.message);
       return;
     }
@@ -142,6 +157,8 @@ const Practice = () => {
     }));
     // Mark as solved
     setSolvedIds((prev) => new Set(prev).add(currentQuestion.id));
+    // Refresh feature usage counter
+    refreshFeatures();
   };
 
   const handleNext = () => {
@@ -211,6 +228,8 @@ const Practice = () => {
 
   return (
     <div>
+      <UpgradeModal isOpen={showUpgrade} onClose={() => setShowUpgrade(false)} feature="AI Question Generator" />
+
       {/* ── Page Header ── */}
       <div className="page-header">
         <div>
@@ -226,11 +245,33 @@ const Practice = () => {
               </span>
             </div>
           )}
-          <button className="btn btn-outline" onClick={() => setShowGenerator(!showGenerator)}>
-            🤖 {showGenerator ? "Hide" : "AI Generate"}
+          <button
+            className="btn btn-outline"
+            onClick={() => {
+              if (aiLocked) {
+                setShowUpgrade(true);
+                return;
+              }
+              setShowGenerator(!showGenerator);
+            }}
+          >
+            {aiLocked ? "🔒 AI Generate (Pro)" : `🤖 ${showGenerator ? "Hide" : "AI Generate"}`}
           </button>
         </div>
       </div>
+
+      {/* ── Usage Bar (free plan daily limit) ── */}
+      <UsageBar />
+
+      {/* ── Daily Limit Warning ── */}
+      {dailyLimitReached && (
+        <div className="feature-locked-banner" style={{ marginBottom: "1rem" }}>
+          <span>🚫 Daily question limit reached. Upgrade to Pro for unlimited practice.</span>
+          <button className="btn btn-primary btn-sm" onClick={() => setShowUpgrade(true)}>
+            Upgrade
+          </button>
+        </div>
+      )}
 
       {/* ── AI Question Generator ── */}
       {showGenerator && (

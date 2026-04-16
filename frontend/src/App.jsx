@@ -30,6 +30,7 @@ import CodeEditor from "./pages/CodeEditor";
 import StudyRoadmap from "./pages/StudyRoadmap";
 import MockInterview from "./pages/MockInterview";
 import Badges from "./pages/Badges";
+import Pricing from "./pages/Pricing";
 
 const AppInner = () => {
   const { isAuthenticated, loading } = useAuth();
@@ -47,7 +48,7 @@ const AppInner = () => {
   return (
     <div className="app-container">
       {isAuthenticated && <Navbar onMenuToggle={() => setSidebarOpen((v) => !v)} />}
-      
+
       {/* Idle timeout warning - shows globally when user is about to be logged out */}
       {isAuthenticated && <IdleWarning />}
 
@@ -131,6 +132,14 @@ const AppInner = () => {
               element={
                 <ProtectedRoute>
                   <Badges />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/pricing"
+              element={
+                <ProtectedRoute>
+                  <Pricing />
                 </ProtectedRoute>
               }
             />

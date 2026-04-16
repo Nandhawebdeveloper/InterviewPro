@@ -1,8 +1,13 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import endpoints from "../services/endpoints";
+import { useAuth } from "../context/AuthContext";
 import ConfirmModal from "../components/ConfirmModal";
+import UpgradeModal from "../components/UpgradeModal";
 
 const MockInterview = () => {
+  const { features, paymentEnabled } = useAuth();
+  const isLocked = paymentEnabled && features && !features.mock_interview;
+  const [showUpgrade, setShowUpgrade] = useState(false);
   const [stage, setStage] = useState("setup"); // setup | interview | result
   const [config, setConfig] = useState({ count: 10, difficulty: "", topic: "", time_limit: 1800 });
   const [interviewId, setInterviewId] = useState(null);
@@ -141,10 +146,20 @@ const MockInterview = () => {
           confirmText="Yes"
           cancelText="No"
         />
+        <UpgradeModal isOpen={showUpgrade} onClose={() => setShowUpgrade(false)} feature="Mock Interview" />
         <div className="page-header">
           <h1>🎤 Mock Interview</h1>
           <p className="text-secondary">Simulate a real interview with timed questions and scoring</p>
         </div>
+
+        {isLocked && (
+          <div className="feature-locked-banner">
+            <span>🔒 Mock Interview is a Pro feature.</span>
+            <button className="btn btn-primary btn-sm" onClick={() => setShowUpgrade(true)}>
+              Upgrade to Pro
+            </button>
+          </div>
+        )}
 
         <div className="interview-setup card">
           <h2>Configure Your Interview</h2>
@@ -199,8 +214,12 @@ const MockInterview = () => {
               />
             </div>
           </div>
-          <button className="btn btn-primary btn-lg" onClick={handleStart} disabled={loading}>
-            {loading ? "Starting..." : "🚀 Start Interview"}
+          <button
+            className="btn btn-primary btn-lg"
+            onClick={isLocked ? () => setShowUpgrade(true) : handleStart}
+            disabled={loading}
+          >
+            {loading ? "Starting..." : isLocked ? "🔒 Pro Only — Start Interview" : "🚀 Start Interview"}
           </button>
         </div>
 

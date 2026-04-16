@@ -85,6 +85,37 @@ ALTER TABLE users ADD COLUMN last_practice_date DATE DEFAULT NULL;
 ALTER TABLE questions ADD COLUMN is_ai_generated BOOLEAN DEFAULT FALSE;
 
 -- ============================================================
+-- Subscription / Plan fields on users table
+-- ============================================================
+ALTER TABLE users ADD COLUMN plan ENUM('free', 'pro', 'team') DEFAULT 'free';
+ALTER TABLE users ADD COLUMN plan_expires_at DATETIME DEFAULT NULL;
+ALTER TABLE users ADD COLUMN razorpay_customer_id VARCHAR(255) DEFAULT NULL;
+
+-- ============================================================
+-- Payments Table
+-- Stores Razorpay payment records for plan upgrades
+-- ============================================================
+CREATE TABLE payments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    razorpay_order_id VARCHAR(255) NOT NULL,
+    razorpay_payment_id VARCHAR(255) DEFAULT NULL,
+    razorpay_signature VARCHAR(255) DEFAULT NULL,
+    plan ENUM('pro', 'team') NOT NULL,
+    amount INT NOT NULL,
+    currency VARCHAR(10) DEFAULT 'INR',
+    status ENUM('created', 'paid', 'failed', 'refunded') DEFAULT 'created',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE INDEX idx_payments_user ON payments(user_id);
+CREATE INDEX idx_payments_order ON payments(razorpay_order_id);
+CREATE INDEX idx_payments_status ON payments(status);
+
+-- ============================================================
 -- AI Usage Tracking Table
 -- Limits AI question generation to 5 per user per day
 -- ============================================================

@@ -292,6 +292,46 @@ const getMyBadges = () => apiService.get("/api/badges/my");
 const checkBadges = () => apiService.post("/api/badges/check");
 
 // ─────────────────────────────────────────────
+// FEATURE CONFIG
+// ─────────────────────────────────────────────
+
+/**
+ * Get feature flags (payment gateway enabled, etc.).
+ * @returns {{ payment_gateway: boolean }}
+ */
+const getFeatureConfig = () => apiService.get("/api/config/features");
+
+// ─────────────────────────────────────────────
+// PAYMENTS
+// ─────────────────────────────────────────────
+
+/**
+ * Create a Razorpay order for plan upgrade.
+ * @param {string} plan - "pro" or "team"
+ * @returns {{ order_id, amount, currency, key_id, user_name, user_email }}
+ */
+const createPaymentOrder = (plan) => apiService.post("/api/payments/create-order", { plan });
+
+/**
+ * Verify Razorpay payment signature and upgrade plan.
+ * @returns {{ plan, plan_expires_at, payment_id }}
+ */
+const verifyPayment = (razorpay_order_id, razorpay_payment_id, razorpay_signature) =>
+  apiService.post("/api/payments/verify", { razorpay_order_id, razorpay_payment_id, razorpay_signature });
+
+/**
+ * Get payment history.
+ * @returns {{ payments }}
+ */
+const getPaymentHistory = () => apiService.get("/api/payments/history");
+
+/**
+ * Get current plan info.
+ * @returns {{ plan, plan_expires_at, is_active }}
+ */
+const getCurrentPlan = () => apiService.get("/api/payments/plan");
+
+// ─────────────────────────────────────────────
 // ADMIN
 // ─────────────────────────────────────────────
 
@@ -376,6 +416,13 @@ const endpoints = {
   getAllBadges,
   getMyBadges,
   checkBadges,
+  // Feature Config
+  getFeatureConfig,
+  // Payments
+  createPaymentOrder,
+  verifyPayment,
+  getPaymentHistory,
+  getCurrentPlan,
 };
 
 export default endpoints;

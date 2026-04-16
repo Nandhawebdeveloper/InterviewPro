@@ -10,6 +10,7 @@ from extensions import db
 from models.mock_interview_model import MockInterview
 from models.question_model import Question
 from utils.response import success_response, error_response
+from utils.feature_access import check_feature_access
 from datetime import datetime
 from sqlalchemy.sql.expression import func
 
@@ -18,6 +19,7 @@ interview_bp = Blueprint("interview", __name__)
 
 @interview_bp.route("/interview/start", methods=["POST"])
 @jwt_required()
+@check_feature_access("mock_interview")
 def start_interview():
     user_id = int(get_jwt_identity())
 

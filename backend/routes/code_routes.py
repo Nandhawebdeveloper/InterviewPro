@@ -13,6 +13,7 @@ from collections import defaultdict
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from utils.response import success_response, error_response
+from utils.feature_access import check_feature_access
 
 code_bp = Blueprint("code", __name__)
 
@@ -44,6 +45,7 @@ def _is_rate_limited(user_id):
 
 @code_bp.route("/code/run", methods=["POST"])
 @jwt_required()
+@check_feature_access("coding")
 def run_code():
     user_id = get_jwt_identity()
 

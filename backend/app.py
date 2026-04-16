@@ -123,6 +123,14 @@ def create_app(config_name=None):
     app.register_blueprint(badge_bp, url_prefix="/api")
     app.register_blueprint(ai_bp, url_prefix="/api")
 
+    # Conditionally register payment routes
+    if app.config.get("PAYMENT_GATEWAY_ENABLED"):
+        from routes.payment_routes import payment_bp
+        app.register_blueprint(payment_bp, url_prefix="/api")
+        logger.info("Payment gateway ENABLED — Razorpay routes registered")
+    else:
+        logger.info("Payment gateway DISABLED — Razorpay routes skipped")
+
     # ---- Error Handlers ----
     @app.errorhandler(404)
     def not_found(error):
@@ -158,6 +166,30 @@ def create_app(config_name=None):
     def health_check():
         return success_response({"app": "InterviewPro API"}, "Healthy")
 
+    # ---- Feature Config (public, optionally enriched if authenticated) ----
+    @app.route("/api/config/features", methods=["GET"])
+    def feature_config():
+        from flask_jwt_extended import verify_jwt_in_request, get_jwt_identity
+        from utils.feature_access import get_user_feature_info
+
+        base = {
+            "payment_gateway": app.config.get("PAYMENT_GATEWAY_ENABLED", False),
+        }
+
+        # If user sends a valid token, include their plan/feature info
+        try:
+            verify_jwt_in_request(optional=True)
+            identity = get_jwt_identity()
+            if identity:
+                from models.user_model import User
+                user = User.query.get(int(identity))
+                if user:
+                    base["user_features"] = get_user_feature_info(user)
+        except Exception:
+            pass  # No token or invalid — just return base config
+
+        return success_response(base, "Feature config retrieved")
+
     # ---- Serve Frontend Static Files (Production) ----
     if not app.config.get("DEBUG") and os.path.isdir(FRONTEND_DIST):
         @app.route("/", defaults={"path": ""})
@@ -180,6 +212,7 @@ def create_app(config_name=None):
         from models.badge_model import Badge, UserBadge
         from models.mock_interview_model import MockInterview
         from models.ai_usage_model import AIUsage
+        from models.payment_model import Payment
 
         db.create_all()
 

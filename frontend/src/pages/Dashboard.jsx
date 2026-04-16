@@ -32,6 +32,7 @@ import { Bar, Doughnut, Line } from "react-chartjs-2";
 import endpoints from "../services/endpoints";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
+import PlanBadge from "../components/PlanBadge";
 
 ChartJS.register(
   CategoryScale,
@@ -53,8 +54,9 @@ ChartJS.register(
 const cssVar = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
 const Dashboard = () => {
-  const { user } = useAuth();
+  const { user, features, paymentEnabled } = useAuth();
   const { isDark } = useTheme();
+  const chartsLocked = paymentEnabled && features && !features.advanced_analytics;
   const [summary, setSummary] = useState(null);
   const [streak, setStreak] = useState(null);
   const [recommendations, setRecommendations] = useState(null);
@@ -322,57 +324,75 @@ const Dashboard = () => {
       )}
 
       {/* ── Charts Row 1 ── */}
-      <div className="grid grid-2" style={{ marginBottom: "2rem" }}>
-        <div className="card">
-          <div className="card-header">📅 Last 7 Days Activity</div>
-          <div style={{ height: "260px" }}>
-            <Line data={activityData} options={baseChartOptions} />
-          </div>
+      {chartsLocked ? (
+        <div
+          className="card charts-locked-card"
+          style={{ marginBottom: "2rem", textAlign: "center", padding: "3rem 2rem" }}
+        >
+          <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>📊🔒</div>
+          <h3 style={{ marginBottom: "0.5rem" }}>Advanced Analytics</h3>
+          <p style={{ color: "var(--text-secondary)", marginBottom: "1.5rem" }}>
+            Detailed charts, topic breakdown, and difficulty analysis are available on the Pro plan.
+          </p>
+          <Link to="/pricing" className="btn btn-primary">
+            💎 Upgrade to Pro
+          </Link>
         </div>
-        <div className="card">
-          <div className="card-header">🏷️ Topic-wise Accuracy</div>
-          <div style={{ height: "260px" }}>
-            <Bar data={topicData} options={barOptions} />
+      ) : (
+        <>
+          <div className="grid grid-2" style={{ marginBottom: "2rem" }}>
+            <div className="card">
+              <div className="card-header">📅 Last 7 Days Activity</div>
+              <div style={{ height: "260px" }}>
+                <Line data={activityData} options={baseChartOptions} />
+              </div>
+            </div>
+            <div className="card">
+              <div className="card-header">🏷️ Topic-wise Accuracy</div>
+              <div style={{ height: "260px" }}>
+                <Bar data={topicData} options={barOptions} />
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
 
-      {/* ── Charts Row 2 ── */}
-      <div className="grid grid-2">
-        <div className="card">
-          <div className="card-header">🎭 Difficulty Breakdown</div>
-          <div style={{ height: "260px", display: "flex", justifyContent: "center" }}>
-            <Doughnut data={diffData} options={doughnutOptions} />
+          {/* ── Charts Row 2 ── */}
+          <div className="grid grid-2">
+            <div className="card">
+              <div className="card-header">🎭 Difficulty Breakdown</div>
+              <div style={{ height: "260px", display: "flex", justifyContent: "center" }}>
+                <Doughnut data={diffData} options={doughnutOptions} />
+              </div>
+            </div>
+            <div className="card">
+              <div className="card-header">📋 Topic Details</div>
+              <div className="table-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Topic</th>
+                      <th>Attempted</th>
+                      <th>Correct</th>
+                      <th>Accuracy</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {summary.topic_performance.map((t) => (
+                      <tr key={t.topic}>
+                        <td style={{ fontWeight: 500 }}>{t.topic}</td>
+                        <td>{t.total}</td>
+                        <td>{t.correct}</td>
+                        <td>
+                          <span style={{ color: accColor(t.accuracy), fontWeight: 700 }}>{t.accuracy}%</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
-        </div>
-        <div className="card">
-          <div className="card-header">📋 Topic Details</div>
-          <div className="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>Topic</th>
-                  <th>Attempted</th>
-                  <th>Correct</th>
-                  <th>Accuracy</th>
-                </tr>
-              </thead>
-              <tbody>
-                {summary.topic_performance.map((t) => (
-                  <tr key={t.topic}>
-                    <td style={{ fontWeight: 500 }}>{t.topic}</td>
-                    <td>{t.total}</td>
-                    <td>{t.correct}</td>
-                    <td>
-                      <span style={{ color: accColor(t.accuracy), fontWeight: 700 }}>{t.accuracy}%</span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+        </>
+      )}
     </div>
   );
 };

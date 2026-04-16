@@ -37,6 +37,13 @@ class Config:
         "CORS_ORIGINS", "http://localhost:5173,http://localhost:3000,https://interview-pro-prep.vercel.app"
     ).split(",")
 
+    # Payment Gateway Toggle
+    PAYMENT_GATEWAY_ENABLED = os.environ.get("PAYMENT_GATEWAY_ENABLED", "false").lower() == "true"
+
+    # Razorpay Configuration (used only when PAYMENT_GATEWAY_ENABLED is True)
+    RAZORPAY_KEY_ID = os.environ.get("RAZORPAY_KEY_ID", "")
+    RAZORPAY_KEY_SECRET = os.environ.get("RAZORPAY_KEY_SECRET", "")
+
 
 class DevelopmentConfig(Config):
     """Development configuration."""

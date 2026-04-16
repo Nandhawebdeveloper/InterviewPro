@@ -16,6 +16,7 @@ from utils.validators import validate_attempt
 from utils.response import success_response, error_response
 from services.dashboard_service import get_user_dashboard, get_admin_analytics
 from utils.decorators import admin_required
+from utils.feature_access import check_daily_limit
 
 # Create blueprint for attempt routes
 attempt_bp = Blueprint("attempts", __name__)
@@ -23,6 +24,7 @@ attempt_bp = Blueprint("attempts", __name__)
 
 @attempt_bp.route("/attempt", methods=["POST"])
 @jwt_required()
+@check_daily_limit()
 def submit_attempt():
     """
     Submit a practice attempt for a question.

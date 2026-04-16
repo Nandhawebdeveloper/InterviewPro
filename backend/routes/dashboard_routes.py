@@ -20,6 +20,7 @@ from models.user_model import User
 from models.attempt_model import Attempt
 from models.question_model import Question
 from utils.response import success_response, error_response
+from utils.feature_access import check_feature_access
 from sqlalchemy import func, case
 
 dashboard_bp = Blueprint("dashboard_extra", __name__)
@@ -30,6 +31,7 @@ dashboard_bp = Blueprint("dashboard_extra", __name__)
 # ─────────────────────────────────────────────
 @dashboard_bp.route("/dashboard/topic-performance", methods=["GET"])
 @jwt_required()
+@check_feature_access("advanced_analytics")
 def topic_performance():
     """GET /api/dashboard/topic-performance"""
     user_id = int(get_jwt_identity())
@@ -64,6 +66,7 @@ def topic_performance():
 # ─────────────────────────────────────────────
 @dashboard_bp.route("/dashboard/difficulty-performance", methods=["GET"])
 @jwt_required()
+@check_feature_access("advanced_analytics")
 def difficulty_performance():
     """GET /api/dashboard/difficulty-performance"""
     user_id = int(get_jwt_identity())
@@ -98,6 +101,7 @@ def difficulty_performance():
 # ─────────────────────────────────────────────
 @dashboard_bp.route("/dashboard/activity", methods=["GET"])
 @jwt_required()
+@check_feature_access("advanced_analytics")
 def activity_timeline():
     """GET /api/dashboard/activity"""
     user_id = int(get_jwt_identity())

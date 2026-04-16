@@ -28,7 +28,9 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  
+  const [paymentEnabled, setPaymentEnabled] = useState(false);
+  const [features, setFeatures] = useState(null); // user's plan-based feature flags
+
   // Idle timer state
   const [idleTime, setIdleTime] = useState(0);
   const idleTimeoutRef = useRef(null);
@@ -63,20 +65,12 @@ export const AuthProvider = ({ children }) => {
       return;
     }
 
-    const events = [
-      'mousedown',
-      'mousemove',
-      'keypress',
-      'scroll',
-      'touchstart',
-      'click',
-      'keydown'
-    ];
+    const events = ["mousedown", "mousemove", "keypress", "scroll", "touchstart", "click", "keydown"];
 
     const handleActivity = () => resetIdleTimer();
 
     // Add event listeners
-    events.forEach(event => {
+    events.forEach((event) => {
       document.addEventListener(event, handleActivity, true);
     });
 
@@ -85,7 +79,7 @@ export const AuthProvider = ({ children }) => {
 
     // Cleanup function
     return () => {
-      events.forEach(event => {
+      events.forEach((event) => {
         document.removeEventListener(event, handleActivity, true);
       });
       clearIdleTimer();
@@ -97,7 +91,7 @@ export const AuthProvider = ({ children }) => {
     if (!user) return;
 
     const interval = setInterval(() => {
-      setIdleTime(prev => prev + 1000);
+      setIdleTime((prev) => prev + 1000);
     }, 1000);
 
     return () => clearInterval(interval);
@@ -107,6 +101,16 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const initAuth = async () => {
       const storedToken = localStorage.getItem("token");
+
+      // Fetch feature flags (send token if available so we get user_features)
+      const configRes = await endpoints.getFeatureConfig();
+      if (configRes.success) {
+        setPaymentEnabled(configRes.data.payment_gateway || false);
+        if (configRes.data.user_features) {
+          setFeatures(configRes.data.user_features);
+        }
+      }
+
       if (storedToken) {
         const res = await endpoints.getMe();
         console.log("getMeRes", res);
@@ -116,6 +120,13 @@ export const AuthProvider = ({ children }) => {
           setUser(null);
         } else {
           setUser(res.data.user);
+          // Re-fetch features now that we know user is valid
+          if (!configRes.data?.user_features) {
+            const configRes2 = await endpoints.getFeatureConfig();
+            if (configRes2.success && configRes2.data.user_features) {
+              setFeatures(configRes2.data.user_features);
+            }
+          }
         }
       }
       setLoading(false);
@@ -164,10 +175,22 @@ export const AuthProvider = ({ children }) => {
     clearIdleTimer();
     localStorage.removeItem("token");
     setUser(null);
+    setFeatures(null);
+  };
+
+  /**
+   * Refresh feature flags from the server (call after plan changes or attempts).
+   */
+  const refreshFeatures = async () => {
+    const res = await endpoints.getFeatureConfig();
+    if (res.success && res.data.user_features) {
+      setFeatures(res.data.user_features);
+    }
   };
 
   const value = {
     user,
+    setUser,
     loading,
     login,
     register,
@@ -177,6 +200,12 @@ export const AuthProvider = ({ children }) => {
     idleTimeout: IDLE_TIMEOUT,
     resetIdleTimer,
     isAdmin: user?.role === "admin",
+    paymentEnabled,
+    isFree: !user?.plan || user?.plan === "free",
+    isPro: user?.plan === "pro",
+    isTeam: user?.plan === "team",
+    features,
+    refreshFeatures,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

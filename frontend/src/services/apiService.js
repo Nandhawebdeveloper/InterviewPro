@@ -29,43 +29,44 @@ const handleResponse = async (requestPromise) => {
     const response = await requestPromise;
     return {
       ...response.data,
-        request: {
-          method: response.config.method?.toUpperCase(),
-          baseURL: response.config.baseURL,
-          url: response.config.url,
-          fullURL: `${response.config.baseURL || ""}${response.config.url || ""}`,
-          params: response.config.params,
-          data: response.config.data,
-          headers: response.config.headers,
-        },
-        response: {
-          status: response.status,
-          statusText: response.statusText,
-          data: response.data,
-          headers: response.headers,
-        },
+      request: {
+        method: response.config.method?.toUpperCase(),
+        baseURL: response.config.baseURL,
+        url: response.config.url,
+        fullURL: `${response.config.baseURL || ""}${response.config.url || ""}`,
+        params: response.config.params,
+        data: response.config.data,
+        headers: response.config.headers,
+      },
+      response: {
+        status: response.status,
+        statusText: response.statusText,
+        data: response.data,
+        headers: response.headers,
+      },
     };
   } catch (error) {
     const debugResponse = error.response || {};
     return {
       success: false,
       message: error.displayMessage || error.message || "Request failed",
+      code: debugResponse.data?.code || null,
       data: {},
-        request: {
-          method: error.config?.method?.toUpperCase(),
-          baseURL: error.config?.baseURL,
-          url: error.config?.url,
-          fullURL: `${error.config?.baseURL || ""}${error.config?.url || ""}`,
-          params: error.config?.params,
-          data: error.config?.data,
-          headers: error.config?.headers,
-        },
-        response: {
-          status: debugResponse.status,
-          statusText: debugResponse.statusText,
-          data: debugResponse.data,
-          headers: debugResponse.headers,
-        },
+      request: {
+        method: error.config?.method?.toUpperCase(),
+        baseURL: error.config?.baseURL,
+        url: error.config?.url,
+        fullURL: `${error.config?.baseURL || ""}${error.config?.url || ""}`,
+        params: error.config?.params,
+        data: error.config?.data,
+        headers: error.config?.headers,
+      },
+      response: {
+        status: debugResponse.status,
+        statusText: debugResponse.statusText,
+        data: debugResponse.data,
+        headers: debugResponse.headers,
+      },
     };
   }
 };
